@@ -3,6 +3,7 @@ package tries
 
 import scala.collection.mutable.ArrayBuffer
 
+//Toplevel Definitionen: überall im package sichtbar (wenn explizit in package ....: ... -> dann auch in Unterpackages sichtbar
 enum Topping:
   case Cheese, Pepperoni, Mushrooms
 
@@ -13,7 +14,7 @@ import Topping.*
 class Pizza:
   val toppings = ArrayBuffer[Topping]()
 
-val p = Pizza()
+val pizza = Pizza()
 
 
 val hwUpper = "hello, world".capitalizeAllWords
@@ -23,5 +24,5 @@ type Money = BigDecimal
 // more definitions here as desired ...
 
 @main def myApp =
-  p.toppings += Cheese
+  pizza.toppings += Cheese
   println("show me the code".capitalizeAllWords)

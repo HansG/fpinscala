@@ -15,3 +15,5 @@ object OptionT:
           case None => F.unit(None)
           case Some(a) => f(a).value
         }
+
+    given optionTMonad1[F[_]](using F: Monad[F]): Monad[OptionT[F, _]] = Monad.composeM[F, Option]

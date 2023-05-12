@@ -1,4 +1,4 @@
-package scautable
+package tries
 
 import munit.CatsEffectSuite
 

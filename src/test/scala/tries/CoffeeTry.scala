@@ -1,6 +1,9 @@
 package tries
 
 import fpinscala.answers.introduction.ThirdExample.{Cafe, CreditCard, *}
+import junit.framework.TestCase
+import org.junit.Test
+import org.junit.runners.JUnit4
 
 
 def tryBuy =
@@ -39,6 +42,7 @@ enum Box[T](contents: T):
   case BoolBox(b: Boolean) extends Box[Boolean](b)
 
 object Box:
+
   def extract[T](b: Box[T]): T = b match
     case IntBox(n)  => n + 1
     case BoolBox(b) => !b
@@ -46,6 +50,23 @@ object Box:
 enum Nat:
   case Zero
   case Succ(n: Nat)
+  def incr: Nat = Succ(this)
+
+
+object Nat:
+  extension (self: Nat)
+    def add(m: Nat): Nat = m match
+      case Zero => self
+
+
+class NatTest:
+  import Nat.*
+  @Test
+  def testAdd = println( Succ(Succ(Zero)).add(Succ(Zero)))
+  @Test
+  def testInc = println( Succ(Succ(Succ(Zero))).incr)
+
+
 
 enum List1[+A]:
   case Nil
@@ -76,10 +97,6 @@ enum Planet(mass: Double, radius: Double):
   case Earth   extends Planet(5.976e+24, 6.37814e6)
 
 object Planet:
-  @main def test =
-    weights("5")
-    weights("8")
-    weights("20")
 
   def weights(earthWeight:  String | Double) =
     val earthWeightd  = earthWeight match
@@ -89,3 +106,15 @@ object Planet:
     val mass = earthWeightd / Earth.surfaceGravity
     for (p <- values)
       println(s"Your weight on $p is ${p.surfaceWeight(mass)}")
+
+class PlanetTest:
+  import tries.Planet.*
+
+  @Test
+  def test =
+    weights("5")
+    weights("8")
+    weights("20")
+
+
+

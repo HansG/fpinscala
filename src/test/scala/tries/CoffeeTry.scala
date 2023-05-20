@@ -115,6 +115,7 @@ class PlanetTest:
     weights("5")
     weights("8")
     weights("20")
+    weights(21.0)
 
 
 

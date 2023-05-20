@@ -1,5 +1,6 @@
 package tries
 
+import cats.Show
 import org.junit.Test
 
 object TypesTry:
@@ -16,20 +17,42 @@ object TypesTry:
       def +(y: Logarithm): Logarithm = Logarithm(math.exp(x) + math.exp(y))
       def *(y: Logarithm): Logarithm = x + y
 
+     /*
+      given Show[Logarithm] with
+       // def show(l : Logarithm): String = l.toDouble.toString   <- ACHTUNG: hier (!) ist Logarithm==Double -> l.toDouble==l!!!
+        def show(l : Logarithm): String = math.exp(l).toString
+
+    */
+    trait ShowE[T]:
+       extension (l: T)
+         def show: String
+
+    given ShowE[Logarithm] with
+      extension (l: Logarithm)
+        def show: String = math.exp(l).toString
+
 
   class LogarithmsTry:
-    import Logarithms.*
 
-    @Test
-    def tryPlusMal =
-      val log2 = Logarithm(2.0)
-      val log3 = Logarithm(3.0)
-      println(log2) // prints 6.0
-      println(log3) // prints 4.999...
-      println((log2).toDouble) // prints 6.0
-      println((log3).toDouble) // prints 4.999...
-      println((log2 * log3).toDouble) // prints 6.0
-      println((log2 + log3).toDouble) // prints 4.999...
+    import TypesTry.Logarithms.Logarithm
+    import tries.TypesTry.Logarithms.ShowE
+
+
+  //  def mprintln[T](t: T)(using S : Show[T]) = println(S.show(t))
+    def mprintln[T: ShowE](t: T) = println(t.show)
+
+      @Test
+      def tryPlusMal =
+        val log2 = Logarithm(2.0)
+        val log3  = Logarithm(3.0)
+        println(log2) // prints 6.0
+        println(log3) // prints 4.999...
+        println(log2.toDouble) // prints 6.0
+        println(log3.toDouble) // prints 4.999...
+        val pr  = log2 * log3
+        mprintln(pr) // prints 6.0
+        mprintln(log2 + log3) // prints 4.999...
+
 
   //val d: Double = log2  ERROR: Found Logarithm required Double
 
@@ -97,18 +120,20 @@ object TypesTry:
       def mul(l: Num, r: Num): Num = l * r
 
 
-  //  type Prog = (n: Nums) => n.Num => n.Num
-    trait Prog :
-      def apply(n : Nums)(n.Num) : n.Num
+    /*
+    // type Prog = (n: Nums) => n.Num => n.Num
+   // trait Prog :
+    //  def apply(n : Nums)(n.Num) : n.Num
 
-    val ex: Prog = nums => x => nums.add(nums.lit(0.8), x)
+    //val ex: Prog = nums => x => nums.add(nums.lit(0.8), x)
 
     def derivative(input: Prog): Double = 0.8
 
     derivative { nums => x => x }
     derivative { nums => x => nums.add(nums.lit(0.8), x) }
-
+  */
   end DependantTypes
 
 end TypesTry
+
 

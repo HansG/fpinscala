@@ -26,8 +26,16 @@ object SimplePulls:
         case Left(r) => (r, init)
         case Right((hd, tl)) => tl.fold(f(init, hd))(f)
 
+
+    def foldX[A](init: A)(f: (A, O) => A): (R, A) =
+      step match
+        case Left(r) => (r, init)
+        case Right((hd, tail)) => tail.foldX(f(init, hd))(f)
+
     def toList: List[O] =
       fold(List.newBuilder[O])((bldr, o) => bldr += o)(1).result
+
+    def toListX: List[O] = foldX[List[_]](List())((l, o) => o :: l   )
 
     def flatMap[O2 >: O, R2](f: R => Pull[O2, R2]): Pull[O2, R2] =
       FlatMap(this, f)

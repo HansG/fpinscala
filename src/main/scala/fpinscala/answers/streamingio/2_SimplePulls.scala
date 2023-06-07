@@ -51,11 +51,26 @@ object SimplePulls:
         case Right((hd, tl)) => Output(hd) >> tl.take(n - 1)
       }
 
+
+    def takeX(n: Int): Pull[O, Option[R]] =
+      if n <= 0 then Result(None)
+      else step match
+        case Left(r) => Result(Some(r))
+        case Right((o, p)) => Output(o) >> p.takeX(n - 1)
+
+
     def drop(n: Int): Pull[O, R] =
       if n <= 0 then this
       else uncons.flatMap {
         case Left(r) => Result(r)
         case Right((_, tl)) => tl.drop(n - 1)
+      }
+
+    def dropX(n: Int): Pull[O, R] =
+      if n <= 0 then this
+      else uncons.flatMap {
+        case Left(r) => Result(r)
+        case Right((o, p)) =>  p.dropX(n - 1)
       }
 
     def takeWhile(f: O => Boolean): Pull[O, Pull[O, R]] =
@@ -65,7 +80,13 @@ object SimplePulls:
           if f(hd) then Output(hd) >> tl.takeWhile(f)
           else Result(Output(hd) >> tl)
       }
-    
+
+    def takeWhileX(f: O => Boolean): Pull[O, Pull[O, R]] =
+      uncons.flatMap {
+        case Left(r) => Result(Result(r))
+        case Right((o, p)) => (if(f(o)) Output(o) else Pull.done) >>   p.takeWhileX(f)
+      }
+
     def dropWhile(f: O => Boolean): Pull[Nothing, Pull[O, R]] =
       uncons.flatMap {
         case Left(r) => Result(Result(r))

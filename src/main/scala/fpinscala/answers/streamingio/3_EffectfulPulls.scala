@@ -23,7 +23,7 @@ object EffectfulPulls:
         case Result(r) => F.unit(Left(r))
         case Output(o) => F.unit(Right(o, Pull.done))
         case Eval(action) => action.map(Left(_))
-        case Uncons(source) =>
+        case Uncons(source) =>  //source.step: R2 = Either[R, (O, Pull[F, O, R])] da Uncons...Pull[F, Nothing, Either[R, (O, Pull[F, O, R])]] -> hier Left(r2:R2) r2=s.asInstanceOf[R2]
           source.step.map(s => Left(s.asInstanceOf[R2]))
         case FlatMap(source, f) => 
           source match

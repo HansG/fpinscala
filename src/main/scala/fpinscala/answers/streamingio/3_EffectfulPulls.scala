@@ -16,6 +16,7 @@ object EffectfulPulls:
     case Uncons[+F[_], +O, +R](source: Pull[F, O, R])
       extends Pull[F, Nothing, Either[R, (O, Pull[F, O, R])]]
 
+    //Destruktor / Compilier eines Pull zu einem F[...]
     def step[F2[x] >: F[x], O2 >: O, R2 >: R](
       using F: Monad[F2]
     ): F2[Either[R2, (O2, Pull[F2, O2, R2])]] =
@@ -23,7 +24,9 @@ object EffectfulPulls:
         case Result(r) => F.unit(Left(r))
         case Output(o) => F.unit(Right(o, Pull.done))
         case Eval(action) => action.map(Left(_))
-        case Uncons(source) =>  //source.step: R2 = Either[R, (O, Pull[F, O, R])] da Uncons...Pull[F, Nothing, Either[R, (O, Pull[F, O, R])]] -> hier Left(r2:R2) r2=s.asInstanceOf[R2]
+        //source.step: R2 = Either[R, (O, Pull[F, O, R])] da Uncons...Pull[F, Nothing, Either[R, (O, Pull[F, O, R])]] -> hier Left(r2:R2) r2=s.asInstanceOf[R2]
+        //Shiftet source.step:Either[R, (O, Pull[F, O, R])]  in Left[R2=Either[...]], so dass ein nächstes FlatMap[.., R, O, R2](..., R2 => ..) möglich wird
+        case Uncons(source) =>
           source.step.map(s => Left(s.asInstanceOf[R2]))
         case FlatMap(source, f) => 
           source match

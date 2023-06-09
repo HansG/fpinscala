@@ -29,6 +29,7 @@ object EffectfulPulls:
           source match
             case FlatMap(s2, g) =>
               s2.flatMap(x => g(x).flatMap(y => f(y))).step
+            //Achtung: hier flatMap von Either
             case other => other.step.flatMap:
               case Left(r) => f(r).step
               case Right((hd, tl)) => F.unit(Right((hd, tl.flatMap(f))))
@@ -115,6 +116,23 @@ object EffectfulPulls:
           Output(out) >> tl.mapAccumulate(s)(f)
 
   object Pull:
+
+    extension [F[_], O, R](self: Pull[F, O, R])
+      def stepViaExtension(using F: Monad[F]): F[Either[R, (O, Pull[F, O, R])]] =
+        self match
+          case Result(r) => F.unit(Left(r))
+          case Output(o) => F.unit(Right(o, Pull.done))
+          case Eval(action) => action.map(Left(_))
+          case Uncons(source) =>
+            source.stepViaExtension.map(r => Left(r.asInstanceOf[R]))
+          case FlatMap(source, f) =>
+            source match
+              case FlatMap(s2, g) =>
+                s2.flatMap(x => g(x).flatMap(y => f(y))).stepViaExtension
+              case other => other.stepViaExtension.flatMap {
+                case Left(r) => f(r).stepViaExtension
+                case Right((hd, tl)) => F.unit(Right((hd, tl.flatMap(f))))
+              }
 
     val done: Pull[Nothing, Nothing, Unit] = Result(())
 

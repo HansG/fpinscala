@@ -41,17 +41,17 @@ object TypesTry:
   //  def mprintln[T](t: T)(using S : Show[T]) = println(S.show(t))
     def mprintln[T: ShowE](t: T) = println(t.show)
 
-      @Test
-      def tryPlusMal =
-        val log2 = Logarithm(2.0)
-        val log3  = Logarithm(3.0)
-        println(log2) // prints 6.0
-        println(log3) // prints 4.999...
-        println(log2.toDouble) // prints 6.0
-        println(log3.toDouble) // prints 4.999...
-        val pr  = log2 * log3
-        mprintln(pr) // prints 6.0
-        mprintln(log2 + log3) // prints 4.999...
+    @Test
+    def tryPlusMal =
+      val log2 = Logarithm(2.0)
+      val log3  = Logarithm(3.0)
+      println(log2) // prints 0.6931471805599453
+      println(log3) // prints 1.0986122886681098
+      println(log2.toDouble) // prints 2.0
+      println(log3.toDouble) // prints 3.0000000000000004
+      val pr  = log2 * log3
+      mprintln(pr) // prints 6.0
+      mprintln(log2 + log3) // prints 4.999...
 
 
   //val d: Double = log2  ERROR: Found Logarithm required Double

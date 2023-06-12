@@ -78,7 +78,6 @@ object SimplePulls:
           if f(hd) then Output(hd) >> tl.takeWhile(f)
           else Result(Output(hd) >> tl)
 
-      }
 
     def takeWhileX(f: O => Boolean): Pull[O, Pull[O, R]] =
       uncons.flatMap {

@@ -16,13 +16,13 @@ object EffectfulPulls:
     case Uncons[+F[_], +O, +R](source: Pull[F, O, R])
       extends Pull[F, Nothing, Either[R, (O, Pull[F, O, R])]]
 
-    //Destruktor / Compiler eines Pull zu einem F[...], jedoch "innen" wieder ein Pull
     /*
-     (O, Pull[F, O, R]) eigentl. "Standard" für Stream: kommt nur bei Uncons und step  vor.
-     Uncons Konstruktor: Typ (R=---) ein ermöglicht ein nächstes FlatMap[.., R, O, R2](..., R2 => ..)
-     step Destruktor
-      case Uncons(source) =>: wegen O=Nothing nur Left[R2] möglich mit R2= Either[R, (O, Pull[F, O, R])] -> cast erlaubt zu Left[R2] (korrekt??)
-      ...dann weitere Anwendung über FlatMap[..,f] .. case Left(r) => f(r)...
+     Uncons: representiert einen Compile-Schritt: partieller Compile zu einem F[ Left[(O, Pull[F, O, R])] - ein "Hineinschauen" in das Pull
+     (wegen .. extends Pull[F, Nothing,...], d.h. O2=Nothing bei step nur Left[R2] möglich, wobei (wegen .. extends Pull[.., , Either[R, (O, Pull[F, O, R])]])
+     R2= Either[R, (O, Pull[F, O, R])] -> Left(s.asInstanceOf[R2]) erlaubt )
+     Compile-Schritt wird hier noch nicht ausgeführt (erst bei ..step), lediglich deklariert!! - dennoch ist nun aufgrund der Typen
+     der Konstruktor eines  FlatMap[F, R2, O, ..](..., R2 => ..) möglich, der auf dem Result R2 aufsetzt
+      mit .. case Left(r) =>  ...; case Right(O, Pull..) => .... - d.h. nach dem "Hineinschauen" Definition der weiteren Behandlung des  "gesehenen"
       */
     def step[F2[x] >: F[x], O2 >: O, R2 >: R](
       using F: Monad[F2]
@@ -32,13 +32,13 @@ object EffectfulPulls:
         case Output(o) => F.unit(Right(o, Pull.done))
         case Eval(action) => action.map(Left(_))
         case Uncons(source) =>
-          source.step.map(s => Left(s.asInstanceOf[R2]))
+          source.step.map(s => Left(s.asInstanceOf[R2]))  //wegen Uncons... extends Pull[F, (O2=)Nothing, (R2=)Either[R, (O, Pull[F, O, R])]] nur Left [R2] möglich
         case FlatMap(source, f) => 
           source match
             case FlatMap(s2, g) =>
               s2.flatMap(x => g(x).flatMap(y => f(y))).step
-            case other => other.step.flatMap:   //!flatMap von Either!!
-              case Left(r) => f(r).step
+            case other => other.step.flatMap:   //!flatMap von F:Monad!!
+              case Left(r) => f(r).step //wenn other ein Uncons: hier Anwendung des f einer aufgesetzten FlatMap-Instanz
               case Right((hd, tl)) => F.unit(Right((hd, tl.flatMap(f))))
 
     def fold[F2[x] >: F[x], R2 >: R, A](init: A)(f: (A, O) => A)(

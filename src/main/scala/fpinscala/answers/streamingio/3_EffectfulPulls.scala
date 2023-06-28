@@ -2,20 +2,9 @@ package fpinscala.answers.streamingio
 
 import fpinscala.answers.iomonad.{IO, Monad}
 import fpinscala.answers.monoids.Monoid
-import fpinscala.exercises.streamingio.EffectfulPulls.Pull.Output
 import org.junit.Test
 
 
-class TestTry:
-  import EffectfulPulls._
-  def down(n: Int): Pull[Nothing1, Int, Unit] =
-    if (n >= 0) Output(n) >> down(n - 1)
-    else Result(())
-
-  @Test
-  def tryDown = {
-    println(down(5).toList)
-  }
 
 object EffectfulPulls:
 
@@ -31,7 +20,7 @@ object EffectfulPulls:
       extends Pull[F, Nothing, Either[R, (O, Pull[F, O, R])]]
 
     /*
-     Uncons: representiert einen (partiellen) Compile-Schritt step zu einem F[ Left[(O, Pull[F, O, R])] - ein "Hineinschauen" in das Pull
+     Uncons: representiert einen (partiellen) Compile-Schritt step/ein "Entkleiden" zu einem F[ Left[(O, Pull[F, O, R])]
      (wegen .. extends Pull[F, Nothing,...], d.h. O2=Nothing bei step nur Left[R2] möglich, wobei (wegen .. extends Pull[.., , Either[R, (O, Pull[F, O, R])]])
      R2= Either[R, (O, Pull[F, O, R])] -> Left(s.asInstanceOf[R2]) erlaubt )
      Compile-Schritt wird hier noch nicht ausgeführt (erst bei ..step), lediglich deklariert!! - dennoch ist nun aufgrund der Typen

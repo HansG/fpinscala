@@ -49,14 +49,7 @@ object SimplePulls:
       else uncons.flatMap:
         case Left(r) => Result(Some(r))
         case Right((hd, tl)) => Output(hd) >> tl.take(n - 1)
-
-
-    def takeX(n: Int): Pull[O, Option[R]] =
-      if n <= 0 then Result(None)
-      else step match
-        case Left(r) => Result(Some(r))
-        case Right((o, p)) => Output(o) >> p.takeX(n - 1)
-
+    
 
     def drop(n: Int): Pull[O, R] =
       if n <= 0 then this

@@ -21,7 +21,13 @@ object ArgPolymorphTry:
 
 
   object VehicleInventoryService :
-    given VehicleInventoryService[Car]  with
+    given VIS[T <: Vehicle] : VehicleInventoryService[T] with
+      extension (vehicle: T)
+        override def checkStock(): Unit = {
+          println(s"checking stock for !Car! = ${vehicle}")
+        }
+
+    /*given VehicleInventoryService[Car]  with
       extension (vehicle: Car)
         override def checkStock(): Unit = {
           println(s"checking stock for !Car! = ${vehicle.name + vehicle.ps}")
@@ -31,7 +37,7 @@ object ArgPolymorphTry:
       extension (vehicle: Bike)
         override def checkStock(): Unit = {
           println(s"checking stock for !Bike! = ${vehicle.name + vehicle.bremse}")
-        }
+        }*/
 
 
 private val mycar: Car = Car("mazda 3 series", "200")

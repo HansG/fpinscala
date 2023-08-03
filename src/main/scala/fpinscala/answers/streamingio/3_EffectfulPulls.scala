@@ -20,12 +20,14 @@ object EffectfulPulls:
       extends Pull[F, Nothing, Either[R, (O, Pull[F, O, R])]]
 
     /*
-     Uncons: representiert einen (partiellen) Compile-Schritt step/ein "Entkleiden" zu einem F[ Left[(O, Pull[F, O, R])]
-     (wegen .. extends Pull[F, Nothing,...], d.h. O2=Nothing bei step nur Left[R2] möglich, wobei (wegen .. extends Pull[.., , Either[R, (O, Pull[F, O, R])]])
-     R2= Either[R, (O, Pull[F, O, R])] -> Left(s.asInstanceOf[R2]) erlaubt )
-     Compile-Schritt wird hier noch nicht ausgeführt (erst bei ..step), lediglich deklariert!! - dennoch ist nun aufgrund der Typen
-     der Konstruktor eines  FlatMap[F, R2, O, ..](..., R2 => ..) möglich, der auf dem Result R2 aufsetzt
-      mit .. case Left(r) =>  ...; case Right(O, Pull..) => .... - d.h. nach dem "Hineinschauen" Definition der weiteren Behandlung des  "gesehenen"
+    Pull: Protokoll für eine Stream Erzeugung
+    step: ein Compile-Schritt, d.h. einen Fs2-Protokollpunkt zum nächstliegenden  Effekt, der ein  Result oder einen Head (: O) und Tail (:Pull) enthält.
+    Uncons:  Protokoll-Anweisung: mache einen step auf die (in Uncons) enthaltene "source"; mache das erhaltene Either[...] zum Result := ...extends Pull[F, Nothing, Either[R, (O, Pull[F, O, R])]]
+        damit kann  als weitere Protokoll-Anweisung ein FlatMap folgen, das auf diesem Result aufsetzt (als Typ "X"), d.h.dieses Result (insb. ggf.  Head :: Tail)
+        auf weitere Protokoll-Anweisungen abbilden kann,
+        d.h. "Hineinschauen" und Definition der weiteren Behandlung des  "gesehenen"
+     (??wegen .. extends Pull[F, Nothing,...], d.h. O=Nothing ist bei step nur Left[R] möglich, -> s.asInstanceOf[R2]) erlaubt ??? s ist ein Either -> mit Left(..) in ein weiters Either)
+
       */
     def step[F2[x] >: F[x], O2 >: O, R2 >: R](
       using F: Monad[F2]

@@ -15,32 +15,32 @@ object ArgPolymorphTry2:
     //hier (unter enum): als normale Methode:
     def printme = println(name)
 
-    //extension hier sinnvoll???? bedeutet dasselbe(?) wie nromale Methode mit Parameter (desc: String)
+    //extension hier sinnvoll???? bedeutet dasselbe(?) wie normale Methode mit Parameter (desc: String)
     extension (desc: String)
-      def printd = println(desc)
+      def printd = println(toString +": "+ desc)
 
 
   trait VehCheck[V <: Vehicle] :
     extension (v : V)  def checkStockVC =
         v.printd(s"Spezielle Desc von VehCheck für $v")
 
-  import tries.ArgPolymorphTry2.*
+  import tries.ArgPolymorphTry2.{VehCheck, Vehicle}
   import Vehicle.*
 
   object VehCheck:
     given VehCheck[Car] with
       extension (v : Car)  def checkStockVC =
-        v.printd(s"Spezielle Desc von VehCheck mit PS ${v.ps}")
+        v.printd(s"Spezielle Desc von Car mit PS ${v.ps}")
 
   object Vehicle:
-    //extension hier eher sinnvoll: nachträglich um Methode erweitert (vehicle: V) ist hier Subjekt der Erweiterung
+    //extension hier eher sinnvoll: nachträglich um Methode erweitert - (vehicle: V) ist hier Subjekt der Erweiterung
     //Achtung: extension erspart Typeclass und implizite Implementierungen/Objekte der Typeclass
-    //hier zudem mit Typparameter V, d.h. liefert Erweiterung für alle V!!!!!
     extension (car: Car)
       def checkStock = {
         println(s"checking stock for vehicle = ${car.name} , PS=${car.ps}")
         car.printd("Spezielle Desc für car")
       }
+    //hier zudem mit Typparameter V, d.h. liefert Erweiterung für alle V!!!!!
     /*extension [V <: Vehicle] (vehicle: V)
       def checkStock  = {
         println(s"checking stock for vehicle = ${vehicle}")
@@ -48,8 +48,10 @@ object ArgPolymorphTry2:
         vehicle.printd("Hi Desc")
       }*/
 
-
-
+import tries.ArgPolymorphTry2.*
+import Vehicle.*
+import VehCheck.given
+import munit.Clue.generate
 
 private val mycar2  = Car("mazda 3 series", "200")
 private val mybike2  = Bike("honda bike firestorm", "Rücktritt")
@@ -57,17 +59,15 @@ private val mybike2  = Bike("honda bike firestorm", "Rücktritt")
 
 object VTApp21  extends App :
 
-  val mycar3  = Car("mazda 3 series", "200")
-  mycar2.checkStock
-  mycar3.checkStock
-  mybike2.checkStock
+  mycar2.checkStockVC
+  mybike2.checkStockVC
 
 //alternativ: mit Context-Bound -> givens werden vom Compiler gesucht
 object VTApp22  extends App :
   trait VehicleSystem :
     def buyVehicle[V <: Vehicle](vehicle: V): Unit =
       println(s"buying vehicle $vehicle")
-      vehicle.checkStock
+      vehicle.checkStockVC
       //      vehiclePricingService.checkPrice(vehicle)
 
   object VehicleApp extends VehicleSystem:  //with VehicleServices[Vehicle]

@@ -28,9 +28,10 @@ object ArgPolymorphTry2:
   import Vehicle.*
 
   object VehCheck:
-    given VehCheck[Car] with
-      extension (v : Car)  def checkStockVC =
-        v.printd(s"Spezielle Desc von Car mit PS ${v.ps}")
+    given VehCheck[Car]:
+      extension (v : Car)
+        def checkStockVC =
+            v.printd(s"Spezielle Desc von Car mit PS ${v.ps}")
 
   object Vehicle:
     //extension hier eher sinnvoll: nachträglich um Methode erweitert - (vehicle: V) ist hier Subjekt der Erweiterung
@@ -52,6 +53,8 @@ import tries.ArgPolymorphTry2.*
 import Vehicle.*
 import VehCheck.given
 import munit.Clue.generate
+
+import scala.language.postfixOps
 
 private val mycar2  = Car("mazda 3 series", "200")
 private val mybike2  = Bike("honda bike firestorm", "Rücktritt")

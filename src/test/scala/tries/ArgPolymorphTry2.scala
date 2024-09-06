@@ -10,7 +10,7 @@ object ArgPolymorphTry2:
 
   enum Vehicle2(name: String):
     case  Car2(name: String, ps : String) extends Vehicle2(name)
-    case  Bike2(name: String, bremse : String) extends Vehicle2(name)
+    case  Bike2(name: String, bremsArt : String) extends Vehicle2(name)
 
     //hier (unter enum): als normale Methode:
     def printme = println(name)
@@ -19,41 +19,38 @@ object ArgPolymorphTry2:
     extension (desc: String)
       def printd = println(toString +": "+ desc)
 
-    extension (car: Car2)
-      def checkByExtension = {
-        println(s"checking stock for vehicle = ${car.name} , PS=${car.ps}")
-        car.printd("Spezielle Desc für car")
-      }
-
-
-  trait VehCheck2 :
-    extension [V <: Vehicle2](v : V)  def checkByTypeClass =
-        v.printd(s"Spezielle Desc von VehCheck für $v")
-
-  import Vehicle2.*
-  object VehCheck2:
-      given VehCheck2 with
-        extension (v : Car2)
-          def checkByTypeClass =
-              v.printd(s"Spezielle Desc von Car mit PS ${v.ps}")
 
   object Vehicle2:
     //extension hier eher sinnvoll: nachträglich um Methode erweitert - (vehicle: V) ist hier Subjekt der Erweiterung
     //Achtung: extension erspart Typeclass und implizite Implementierungen/Objekte der Typeclass
-    extension (car: Car2)
+    extension (v: Vehicle2)
       def checkByExtension = {
-        println(s"checking stock for vehicle = ${car.name} , PS=${car.ps}")
-        car.printd("Spezielle Desc für car")
+        println(s"checkByExtension for vehicle = ${v}")
       }
-    //hier zudem mit Typparameter V, d.h. liefert Erweiterung für alle V!!!!!
-    /*extension [V <: Vehicle] (vehicle: V)
-      def checkStock  = ...*/
+      //hier zudem mit Typparameter V, d.h. liefert Erweiterung für alle V!!!!!
+      /*extension [V <: Vehicle] (car: V)
+        def checkStock  = ...*/
 
-import tries.ArgPolymorphTry2.*
-import Vehicle2.*
-import Vehicle2.given
+  //hier zudem mit Typparameter V, d.h. liefert Erweiterung für alle V!!!!!
+  /*extension (vehicle: V)
+    def checkStock  = ...*/
+  trait VehCheck2 :
+    extension  (v : Vehicle2)  def checkByTypeClass : Unit
+
+  object VehCheck2:
+      import tries.ArgPolymorphTry2.Vehicle2.*
+      given VehCheck2 with
+        extension   (v : Vehicle2)
+          def checkByTypeClass = v match
+            case c : Car2 => v.printd(s"Car Speziell mit PS ${c.ps}")
+            case b : Bike2 => b.printd(s"Bike Speziell  mit bremsArt ${b.bremsArt}")
+
+
+import tries.ArgPolymorphTry2.{Vehicle2, *}
+import Vehicle2.{ *, given}
 import VehCheck2.given
 import munit.Clue.generate
+import  Vehicle2.*
 
 import scala.language.postfixOps
 
@@ -62,16 +59,11 @@ private val mybike2  = Bike2("honda bike firestorm", "Rücktritt")
 
 
 object VTApp21  extends App :
-
-  extension (car: Car2)
-    def checkByExtension = {
-      println(s"checking stock for vehicle = ${car.name} , PS=${car.ps}")
-      car.printd("Spezielle Desc für car")
-    }
+  import munit.Clue.generate
 
   mycar2.checkByTypeClass
   mycar2.checkByExtension
-  mybike2.checkByExtension
+  mybike2.checkByTypeClass
 
 //alternativ: mit Context-Bound -> givens werden vom Compiler gesucht
 object VTApp22  extends App :
@@ -83,20 +75,12 @@ object VTApp22  extends App :
 
   object VehicleApp extends VehicleSystem:  //with VehicleServices[Vehicle]
     buyVehicle(mycar2)
+    println("einmal init")
     buyVehicle(mybike2)
 
   VehicleApp.buyVehicle(mycar2)
-  VehicleApp.buyVehicle(mybike2)
+//  VehicleApp.buyVehicle(mybike2)
 
-  object VehicleAppE extends App with VehicleSystem  //with VehicleServices[Vehicle]
-  //    import ArgPolymorphTry.VehicleInventoryService.given
-
-  VehicleAppE.buyVehicle(mycar2)
-  VehicleAppE.buyVehicle(mybike2)
-
-
-import ArgPolymorphTry2.*
-import ArgPolymorphTry2.Vehicle2.*
 
 
 

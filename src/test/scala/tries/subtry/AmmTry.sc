@@ -1,4 +1,4 @@
-import fpinscala.exercises.datastructures.List
+import fpinscala.answers.datastructures.List
 
 import List.*
 

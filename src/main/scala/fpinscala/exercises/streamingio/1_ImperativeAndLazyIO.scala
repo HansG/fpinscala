@@ -13,12 +13,12 @@ object ImperativeAndLazyIO:
   into `IO`.
                              */
 
-  import java.io.*
+  import scala.io.*
 
   def linesGt40k(filename: String): IO[Boolean] = IO:
     // There are a number of convenience functions in scala.io.Source
     // for reading from external sources such as files.
-    val src = io.Source.fromFile(filename)
+    val src = Source.fromFile(filename)
     try
       var count = 0
       // Obtain a stateful iterator from the Source
@@ -63,7 +63,7 @@ object ImperativeAndLazyIO:
                              */
 
   def lines(filename: String): IO[LazyList[String]] = IO:
-    val src = io.Source.fromFile(filename)
+    val src = Source.fromFile(filename)
     src.getLines().to(LazyList) ++ { src.close; LazyList.empty }
                             /*
 

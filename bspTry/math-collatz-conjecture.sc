@@ -1,10 +1,11 @@
-// summary : Collatz conjecture / conjecture de syracuse.
-// run-with : scala-cli $file
-
-// ---------------------
 //> using scala "3.4.2"
 //> using dep "org.scalatest::scalatest:3.2.10"
 // ---------------------
+
+
+// summary : Collatz conjecture / conjecture de syracuse.
+// run-with : scala-cli $file
+
 
 /*
 Collatz conjecture wikipedia : https://en.wikipedia.org/wiki/Collatz_conjecture

@@ -15,28 +15,24 @@ import scala.math.BigDecimal.RoundingMode
 import scala.math.*
 
 
-def e(iter:Int):BigDecimal = {
+def e(x : BigDecimal, iter:Int):BigDecimal = {
   val from = BigDecimal(1, java.math.MathContext.UNLIMITED)
   LazyList
-    .iterate( (1, from, BigDecimal(1)) ) { case (n, result, fact) =>
+    .iterate( (1, from, BigDecimal(1), BigDecimal(1)) ) { case (n, result, fact, y) =>
       val newFact = fact * n
-      val newResult = result + 1/newFact
-      (n+1, newResult, newFact)
-    }.collect {case (n, result, _) if iter == n => result}
+      val newy = y * x
+      val newResult = result + newy/newFact
+      (n+1, newResult, newFact, newy)
+    }.collect {case (n, result, _, _) if iter == n => result}
     .head
 }
 
-
-class ETest extends AnyFlatSpec with should.Matchers {
-  override def suiteName: String = "FactTest"
-
-  "e" should "return the right result" in {
-    e(20).toDouble shouldBe E
-  }
-  it should "give high precision value" in {
-    val computed = e(2000).setScale(5000, RoundingMode.FLOOR)
-    info(computed.toString)
-  }
-}
-
+e(1,20)
 //org.scalatest.tools.Runner.main(Array("-oDF", "-s", classOf[ETest].getName))
+
+e(3,20)
+e(5,20)
+e(3,100) * e(5,100)
+e(8,100)
+e(9, 100)
+e(8,100) * e(1,100)

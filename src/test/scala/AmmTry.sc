@@ -12,3 +12,5 @@ val result = List(1,2,3,4,5) match
   case null => 102
 
 println(result)
+
+import fpinscala.answers.streamingio.SimplePulls.*

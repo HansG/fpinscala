@@ -1,6 +1,7 @@
 package tries
 
 import munit.CatsEffectSuite
+import io.github.quafadas.scautable.scautable
 
 class TableTest extends CatsEffectSuite {
 

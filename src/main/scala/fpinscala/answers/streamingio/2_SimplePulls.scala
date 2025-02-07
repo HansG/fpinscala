@@ -3,6 +3,32 @@ package fpinscala.answers.streamingio
 import fpinscala.answers.iomonad.{IO, Monad}
 import fpinscala.answers.monoids.Monoid
 
+//§§ nur Demo eines enum mit Werten: (unten Enum mit Typ-Parametern)
+object InfoEnum:
+  enum Transaction(amount: Double, baseFeeRate: Double):
+    case Deposit(amount: Double) extends Transaction(amount, 0.01)
+    case Withdrawal(amount: Double) extends Transaction(amount, 0.02)
+    case Transfer(amount: Double) extends Transaction(amount, 0.015)
+    case Payment(amount: Double) extends Transaction(amount, 0.005)
+
+    def calculateBaseFee: Double = amount * baseFeeRate
+
+  object Transaction:
+    extension (self: Transaction)
+      def calculateBF2: Double = self.calculateBaseFee * 2.0
+
+  import Transaction.*
+
+  val trans: List[Transaction] = List(
+    Deposit(1000.0),
+    Withdrawal(2000.0),
+    Transfer(500.0),
+    Payment(100.0)
+  )
+
+  trans.map { t => t.calculateBF2 }
+
+
 object SimplePulls:
 
   enum Pull[+O, +R]:
